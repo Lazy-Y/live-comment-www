@@ -7,6 +7,7 @@ export const FETCH_USER_QUERY = gql`
   query fetchUser($id:ID!){
     user(id:$id){
       ...UserProfile__User
+      ...PostComposer__User
     }
   }
 `;
@@ -21,9 +22,13 @@ const AppContainer = () => {
         return <div>{error}</div>
     }
 
+    const loadFetchUser = (id: string) => {
+        fetchUser({ variables: { id } })
+    }
+
     return <>
-        <UserProfile data={data} fetchUser={fetchUser} />
-        <PostContainer />
+        <UserProfile data={data?.user} fetchUser={loadFetchUser} />
+        <PostContainer user={data?.user} />
     </>
 }
 

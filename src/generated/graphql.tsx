@@ -73,6 +73,10 @@ export type FetchUserQueryVariables = Exact<{
 
 export type FetchUserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: number, userName: string } };
 
+export type PostComposer__UserFragment = { __typename?: 'User', id: number, userName: string };
+
+export type PostItem__PostFragment = { __typename?: 'Post', id: number, content: string, user: { __typename?: 'User', userName: string } };
+
 export type AllPostsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -80,6 +84,21 @@ export type AllPostsQuery = { __typename?: 'Query', allPosts: Array<{ __typename
 
 export type UserProfile__UserFragment = { __typename?: 'User', id: number, userName: string };
 
+export const PostComposer__UserFragmentDoc = gql`
+    fragment PostComposer__User on User {
+  id
+  userName
+}
+    `;
+export const PostItem__PostFragmentDoc = gql`
+    fragment PostItem__Post on Post {
+  id
+  user {
+    userName
+  }
+  content
+}
+    `;
 export const UserProfile__UserFragmentDoc = gql`
     fragment UserProfile__User on User {
   id
@@ -90,9 +109,11 @@ export const FetchUserDocument = gql`
     query fetchUser($id: ID!) {
   user(id: $id) {
     ...UserProfile__User
+    ...PostComposer__User
   }
 }
-    ${UserProfile__UserFragmentDoc}`;
+    ${UserProfile__UserFragmentDoc}
+${PostComposer__UserFragmentDoc}`;
 
 /**
  * __useFetchUserQuery__
@@ -124,14 +145,10 @@ export type FetchUserQueryResult = Apollo.QueryResult<FetchUserQuery, FetchUserQ
 export const AllPostsDocument = gql`
     query allPosts {
   allPosts {
-    id
-    user {
-      userName
-    }
-    content
+    ...PostItem__Post
   }
 }
-    `;
+    ${PostItem__PostFragmentDoc}`;
 
 /**
  * __useAllPostsQuery__
