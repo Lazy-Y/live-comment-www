@@ -9,7 +9,7 @@ interface Props {
 const PostContainer = ({ user }: Props) => {
     return <>
         <h1>Posts</h1>
-        <PostComposer user={user} />
+        {user && <PostComposer user={user} />}
         <br />
         <PostList />
     </>
