@@ -1,14 +1,12 @@
-import React from 'react';
 import './App.css';
-import PostContainer from './components/PostContainer';
-import UserProfile from './components/UserProfile';
+import AppContainer from './components/AppContainer';
+
 
 function App() {
   return (
     <div className="App">
-      <UserProfile />
-      <PostContainer />
-    </div>
+      <AppContainer />
+    </div >
   );
 }
 

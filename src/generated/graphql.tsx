@@ -66,11 +66,6 @@ export type User = {
   userName: Scalars['String'];
 };
 
-export type AllPostsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type AllPostsQuery = { __typename?: 'Query', allPosts: Array<{ __typename?: 'Post', content: string, user: { __typename?: 'User', userName: string } }> };
-
 export type FetchUserQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -78,10 +73,58 @@ export type FetchUserQueryVariables = Exact<{
 
 export type FetchUserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: number, userName: string } };
 
+export type AllPostsQueryVariables = Exact<{ [key: string]: never; }>;
 
+
+export type AllPostsQuery = { __typename?: 'Query', allPosts: Array<{ __typename?: 'Post', id: number, content: string, user: { __typename?: 'User', userName: string } }> };
+
+export type UserProfile__UserFragment = { __typename?: 'User', id: number, userName: string };
+
+export const UserProfile__UserFragmentDoc = gql`
+    fragment UserProfile__User on User {
+  id
+  userName
+}
+    `;
+export const FetchUserDocument = gql`
+    query fetchUser($id: ID!) {
+  user(id: $id) {
+    ...UserProfile__User
+  }
+}
+    ${UserProfile__UserFragmentDoc}`;
+
+/**
+ * __useFetchUserQuery__
+ *
+ * To run a query within a React component, call `useFetchUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchUserQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useFetchUserQuery(baseOptions: Apollo.QueryHookOptions<FetchUserQuery, FetchUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FetchUserQuery, FetchUserQueryVariables>(FetchUserDocument, options);
+      }
+export function useFetchUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FetchUserQuery, FetchUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FetchUserQuery, FetchUserQueryVariables>(FetchUserDocument, options);
+        }
+export type FetchUserQueryHookResult = ReturnType<typeof useFetchUserQuery>;
+export type FetchUserLazyQueryHookResult = ReturnType<typeof useFetchUserLazyQuery>;
+export type FetchUserQueryResult = Apollo.QueryResult<FetchUserQuery, FetchUserQueryVariables>;
 export const AllPostsDocument = gql`
     query allPosts {
   allPosts {
+    id
     user {
       userName
     }
@@ -116,39 +159,3 @@ export function useAllPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<A
 export type AllPostsQueryHookResult = ReturnType<typeof useAllPostsQuery>;
 export type AllPostsLazyQueryHookResult = ReturnType<typeof useAllPostsLazyQuery>;
 export type AllPostsQueryResult = Apollo.QueryResult<AllPostsQuery, AllPostsQueryVariables>;
-export const FetchUserDocument = gql`
-    query fetchUser($id: ID!) {
-  user(id: $id) {
-    id
-    userName
-  }
-}
-    `;
-
-/**
- * __useFetchUserQuery__
- *
- * To run a query within a React component, call `useFetchUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useFetchUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useFetchUserQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useFetchUserQuery(baseOptions: Apollo.QueryHookOptions<FetchUserQuery, FetchUserQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<FetchUserQuery, FetchUserQueryVariables>(FetchUserDocument, options);
-      }
-export function useFetchUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FetchUserQuery, FetchUserQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<FetchUserQuery, FetchUserQueryVariables>(FetchUserDocument, options);
-        }
-export type FetchUserQueryHookResult = ReturnType<typeof useFetchUserQuery>;
-export type FetchUserLazyQueryHookResult = ReturnType<typeof useFetchUserLazyQuery>;
-export type FetchUserQueryResult = Apollo.QueryResult<FetchUserQuery, FetchUserQueryVariables>;

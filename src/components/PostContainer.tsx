@@ -4,6 +4,7 @@ import { useAllPostsQuery } from '../generated/graphql';
 export const ALL_POSTS_QUERY = gql`
     query allPosts{
         allPosts{
+            id
             user{
                 userName
             }
@@ -22,7 +23,7 @@ const PostContainer = () => {
         return <div>{error}</div>
     }
     return <><h1>Posts</h1><>{
-        data?.allPosts.map(({ content, user }) => <li>{user.userName}: {content}</li>)
+        data?.allPosts.map(({ id, content, user }) => <li key={id}>{user.userName}: {content}</li>)
     }
     </></>
 }

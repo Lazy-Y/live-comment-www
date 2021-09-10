@@ -1,30 +1,23 @@
-import { gql } from '@apollo/client';
+import { gql, QueryLazyOptions } from '@apollo/client';
 import { ChangeEvent, useState } from 'react';
-import { useFetchUserLazyQuery } from '../generated/graphql';
+import { Exact, FetchUserQuery } from '../generated/graphql';
 
-export const FETCH_USER_QUERY = gql`
-  query fetchUser($id:ID!){
-    user(id:$id){
-      id
-      userName
-    }
+export const USER_PROFILE_FRAG = gql`
+  fragment UserProfile__User on User {
+    id
+    userName
   }
 `;
 
+interface Props {
+    data: FetchUserQuery | undefined,
+    fetchUser: (options?: QueryLazyOptions<Exact<{
+        id: string;
+    }>> | undefined) => void
+}
 
-const UserProfile = () => {
-    const [loadFetchUser, { loading, error, data }] = useFetchUserLazyQuery();
+const UserProfile = ({ data, fetchUser }: Props) => {
     const [inputValue, onInputChange] = useState<string>('')
-
-    console.log(loading, data, error);
-
-
-    if (loading) {
-        return <div>Loading...</div>
-    }
-    if (error) {
-        return <div>{error}</div>
-    }
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
@@ -33,19 +26,19 @@ const UserProfile = () => {
         }
     }
 
-    const fetchUser = () => {
-        console.log('load fetch user');
-        loadFetchUser({ variables: { id: inputValue } })
-        console.log('load fetch user end');
+    const loadFetchUser = () => {
+        fetchUser({ variables: { id: inputValue } })
     }
+
+    const { user } = data ?? {};
 
     return <div>
         <h1>User</h1>
         <input type="text" name="name" placeholder="User ID" value={inputValue} onChange={handleChange} />
         <br />
-        <button disabled={inputValue === ''} onClick={fetchUser}>Switch User</button>
+        <button disabled={inputValue === ''} onClick={loadFetchUser}>Switch User</button>
         <br />
-        <label>Current User: {data?.user?.userName}</label>
+        <label>Current User: {user?.userName}</label>
     </div>
 }
 
