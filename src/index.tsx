@@ -7,7 +7,34 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 
 const client = new ApolloClient({
   uri: 'http://localhost:3000/graphql',
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache(
+    {
+      typePolicies: {
+        Query: {
+          fields: {
+            queryPosts: {
+              // Don't cache separate results based on
+              // any of this field's arguments.
+              keyArgs: false,
+              // Concatenate the incoming list items with
+              // the existing list items.
+              merge(existing, incoming) {
+                console.log(existing, incoming);
+                let edges = existing?.edges ?? []
+                edges = edges.concat(incoming.edges)
+                const { nextAfterCursor } = incoming;
+                return {
+                  ...existing ?? {},
+                  edges,
+                  nextAfterCursor
+                };
+              },
+            }
+          }
+        }
+      }
+    }
+  ),
 });
 
 ReactDOM.render(

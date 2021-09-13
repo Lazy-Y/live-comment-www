@@ -33,6 +33,22 @@ export type MutationCreateUserArgs = {
   userName: Scalars['String'];
 };
 
+export type PageArgs = {
+  afterCursor?: Maybe<Scalars['String']>;
+  beforeCursor?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Float']>;
+  order?: Maybe<Scalars['String']>;
+};
+
+export type PaginatedPost = {
+  __typename?: 'PaginatedPost';
+  edges?: Maybe<Array<PostEdge>>;
+  nextAfterCursor?: Maybe<Scalars['String']>;
+  nextBeforeCursor?: Maybe<Scalars['String']>;
+  nodes?: Maybe<Array<Post>>;
+  totalCount: Scalars['Int'];
+};
+
 export type Post = {
   __typename?: 'Post';
   content: Scalars['String'];
@@ -42,16 +58,28 @@ export type Post = {
   user: User;
 };
 
+export type PostEdge = {
+  __typename?: 'PostEdge';
+  cursor: Scalars['String'];
+  node: Post;
+};
+
 export type Query = {
   __typename?: 'Query';
   allPosts: Array<Post>;
   post: Post;
+  queryPosts: PaginatedPost;
   user: User;
 };
 
 
 export type QueryPostArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryQueryPostsArgs = {
+  pageArg: PageArgs;
 };
 
 
@@ -85,10 +113,12 @@ export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __type
 
 export type PostItem__PostFragment = { __typename?: 'Post', id: number, content: string, user: { __typename?: 'User', userName: string } };
 
-export type AllPostsQueryVariables = Exact<{ [key: string]: never; }>;
+export type PostListQueryVariables = Exact<{
+  data: PageArgs;
+}>;
 
 
-export type AllPostsQuery = { __typename?: 'Query', allPosts: Array<{ __typename?: 'Post', id: number, content: string, user: { __typename?: 'User', userName: string } }> };
+export type PostListQuery = { __typename?: 'Query', queryPosts: { __typename?: 'PaginatedPost', nextAfterCursor?: Maybe<string>, edges?: Maybe<Array<{ __typename?: 'PostEdge', node: { __typename?: 'Post', id: number, content: string, user: { __typename?: 'User', userName: string } } }>> } };
 
 export type UserProfile__UserFragment = { __typename?: 'User', id: number, userName: string };
 
@@ -184,37 +214,43 @@ export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
 export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
 export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
-export const AllPostsDocument = gql`
-    query allPosts {
-  allPosts {
-    ...PostItem__Post
+export const PostListDocument = gql`
+    query PostList($data: PageArgs!) {
+  queryPosts(pageArg: $data) {
+    edges {
+      node {
+        ...PostItem__Post
+      }
+    }
+    nextAfterCursor
   }
 }
     ${PostItem__PostFragmentDoc}`;
 
 /**
- * __useAllPostsQuery__
+ * __usePostListQuery__
  *
- * To run a query within a React component, call `useAllPostsQuery` and pass it any options that fit your needs.
- * When your component renders, `useAllPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `usePostListQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePostListQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useAllPostsQuery({
+ * const { data, loading, error } = usePostListQuery({
  *   variables: {
+ *      data: // value for 'data'
  *   },
  * });
  */
-export function useAllPostsQuery(baseOptions?: Apollo.QueryHookOptions<AllPostsQuery, AllPostsQueryVariables>) {
+export function usePostListQuery(baseOptions: Apollo.QueryHookOptions<PostListQuery, PostListQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<AllPostsQuery, AllPostsQueryVariables>(AllPostsDocument, options);
+        return Apollo.useQuery<PostListQuery, PostListQueryVariables>(PostListDocument, options);
       }
-export function useAllPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllPostsQuery, AllPostsQueryVariables>) {
+export function usePostListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PostListQuery, PostListQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<AllPostsQuery, AllPostsQueryVariables>(AllPostsDocument, options);
+          return Apollo.useLazyQuery<PostListQuery, PostListQueryVariables>(PostListDocument, options);
         }
-export type AllPostsQueryHookResult = ReturnType<typeof useAllPostsQuery>;
-export type AllPostsLazyQueryHookResult = ReturnType<typeof useAllPostsLazyQuery>;
-export type AllPostsQueryResult = Apollo.QueryResult<AllPostsQuery, AllPostsQueryVariables>;
+export type PostListQueryHookResult = ReturnType<typeof usePostListQuery>;
+export type PostListLazyQueryHookResult = ReturnType<typeof usePostListLazyQuery>;
+export type PostListQueryResult = Apollo.QueryResult<PostListQuery, PostListQueryVariables>;
